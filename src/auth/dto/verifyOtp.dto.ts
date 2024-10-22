@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-export class varifyOtpDto {
+export class VerifyOtpDto {
   @IsNotEmpty()
   @IsEmail({}, { message: 'Please give correct mailed' })
   @IsString()

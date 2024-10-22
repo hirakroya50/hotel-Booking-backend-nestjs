@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-export class loginDto {
+export class LoginDto {
   @IsNotEmpty()
   @IsEmail({}, { message: 'PLEASE GIVE CORRECT MAILED' })
   @IsString()
@@ -12,7 +12,7 @@ export class loginDto {
   readonly password: string;
 }
 
-export class ForgetPasswordDto_tokenGeneration {
+export class ForgetPasswordDtoTokenGeneration {
   @IsNotEmpty()
   @IsEmail({}, { message: 'PLEASE GIVE CORRECT MAILID' })
   @IsString()

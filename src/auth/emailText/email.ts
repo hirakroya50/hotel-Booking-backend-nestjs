@@ -1,6 +1,5 @@
 export function forgetPasswordEmail(token: string) {
   return `
-  
 <body style="font-family: system-ui, math, sans-serif">
   <div>
     <h1>Hotel Booking page , Forget password request</h1>

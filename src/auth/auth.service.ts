@@ -14,19 +14,18 @@ import {
 } from './dto/generateOtp.dto';
 import { SingUpDto } from './dto/signup.dto';
 import { UserSingupOtp } from './schemas/userSingupOtp.schema';
-import { varifyOtpDto } from './dto/verifyOtp.dto';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
 import * as bcrypt from 'bcryptjs';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import {
   ForgetPasswordDto,
-  ForgetPasswordDto_tokenGeneration,
-  loginDto,
+  ForgetPasswordDtoTokenGeneration,
+  LoginDto,
 } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { GoogleLoginDto } from './dto/GoogleLogin.dto';
 import { forgetPasswordEmail } from './emailText/email';
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+import nodemailer from 'nodemailer';
 @Injectable()
 export class AuthService {
   constructor(
@@ -52,15 +51,15 @@ export class AuthService {
 
   async genRateOTPforSignup(generateOtpDto: GenerateOtpDto) {
     try {
-      let { email } = generateOtpDto;
+      const { email } = generateOtpDto;
       //check the email is exist in the database or not
 
-      let user_exist = await this.userModel.findOne({ email });
+      const user_exist = await this.userModel.findOne({ email });
       // console.log(user_exist, 'userrr');
       if (user_exist) {
         throw new ConflictException('email exist');
       }
-      let alreadyGeneratedOTP = await this.userSingUPOtpModel.findOne({
+      const alreadyGeneratedOTP = await this.userSingUPOtpModel.findOne({
         email,
       });
 
@@ -70,7 +69,7 @@ export class AuthService {
         );
       }
 
-      let otp = Math.floor(100000 + Math.random() * 900000);
+      const otp = Math.floor(100000 + Math.random() * 900000);
 
       // send the otp to the user mail
       const transporter = nodemailer.createTransport({
@@ -96,7 +95,7 @@ export class AuthService {
             </body>`, // html body
         },
 
-        (error, info) => {
+        (error) => {
           if (error) {
             console.log(error);
             return {
@@ -113,7 +112,7 @@ export class AuthService {
       );
 
       //save the otp and the mail in the database
-      let userSingUPOtp = await this.userSingUPOtpModel.create({
+      await this.userSingUPOtpModel.create({
         email,
         otp,
       });
@@ -141,11 +140,11 @@ export class AuthService {
     }
   }
 
-  async verifySignupOtp(verifyOtpDto: varifyOtpDto) {
+  async verifySignupOtp(verifyOtpDto: VerifyOtpDto) {
     try {
-      let { email, otp } = verifyOtpDto;
+      const { email, otp } = verifyOtpDto;
 
-      let userOtpData = await this.userSingUPOtpModel.findOne({ email });
+      const userOtpData = await this.userSingUPOtpModel.findOne({ email });
 
       if (userOtpData?.otp === otp) {
         return { status: true };
@@ -163,8 +162,8 @@ export class AuthService {
 
   async singUp(signupDto: SingUpDto): Promise<any> {
     try {
-      let { email, password } = signupDto;
-      let Exist_user = await this.userModel.findOne({ email });
+      const { email, password } = signupDto;
+      const Exist_user = await this.userModel.findOne({ email });
 
       if (Exist_user) {
         throw new ConflictException('email exist');
@@ -196,10 +195,10 @@ export class AuthService {
     try {
       // console.log(GoogleLoginDto);
       const { email, name, sub, picture } = GoogleLoginDto;
-      let Exist_user = await this.userModel.findOne({ email });
+      const Exist_user = await this.userModel.findOne({ email });
       if (Exist_user) {
         // verify the user by the unic id "sub"(that generate by the google )
-        let sub_existing = Exist_user?.sub;
+        const sub_existing = Exist_user?.sub;
         if (sub !== sub_existing) {
           // user is not varified
           throw new UnauthorizedException(
@@ -236,7 +235,7 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: loginDto): Promise<any> {
+  async login(loginDto: LoginDto): Promise<any> {
     try {
       const { email, password } = loginDto;
       const user = await this.userModel.findOne({ email });
@@ -266,7 +265,7 @@ export class AuthService {
 
   // forget password route
   async forgetPasswordTokenLinkSend(
-    ForgetPasswordDto_tokenGeneration: ForgetPasswordDto_tokenGeneration,
+    ForgetPasswordDto_tokenGeneration: ForgetPasswordDtoTokenGeneration,
   ): Promise<any> {
     try {
       const { email } = ForgetPasswordDto_tokenGeneration;
@@ -278,7 +277,7 @@ export class AuthService {
       // generate token by jwt
       const jwtToken = await this.jwtService.signAsync({ email });
 
-      let emailText = forgetPasswordEmail(jwtToken);
+      const emailText = forgetPasswordEmail(jwtToken);
       // Extract the email from the payload
       // const decodedToken = await this.jwtService.verifyAsync(jwtToken);
       // Extract the email from the payload
@@ -311,7 +310,7 @@ export class AuthService {
           html: emailText, // html body
         },
 
-        (error, info) => {
+        (error) => {
           if (error) {
             console.log(error);
             return {
@@ -362,7 +361,7 @@ export class AuthService {
         //change the password
         const hashedPassword = await bcrypt.hash(password, 10);
         //update the new password
-        const user = await this.userModel.updateOne(
+        await this.userModel.updateOne(
           { email },
           {
             $set: {
@@ -379,7 +378,7 @@ export class AuthService {
         // delete the token from the password
       } else {
         // if user notvarify the token
-        const user = await this.userModel.updateOne(
+        await this.userModel.updateOne(
           { email },
           {
             $set: {
@@ -407,16 +406,16 @@ export class AuthService {
     try {
       const { email } = genegenerateOtpDto;
       //check the user is present ot not
-      let user_exist = await this.userModel.findOne({ email });
+      const user_exist = await this.userModel.findOne({ email });
 
       if (!user_exist) {
         throw new UnauthorizedException('email not exist');
       }
 
       //create otp
-      let otp = Math.floor(100000 + Math.random() * 900000);
+      const otp = Math.floor(100000 + Math.random() * 900000);
       // save the otp
-      const user = await this.userModel.updateOne(
+      await this.userModel.updateOne(
         { email },
         {
           $set: {
@@ -448,7 +447,7 @@ export class AuthService {
             </body>`, // html body
         },
 
-        (error, info) => {
+        (error) => {
           if (error) {
             console.log(error);
             return {
@@ -484,7 +483,7 @@ export class AuthService {
     try {
       const { otp, email, password } = resetPassword_otp_Verification;
       // user exist or not
-      let user_exist = await this.userModel.findOne({ email });
+      const user_exist = await this.userModel.findOne({ email });
       if (!user_exist) {
         throw new UnauthorizedException('email not exist');
       }
@@ -497,7 +496,7 @@ export class AuthService {
       //change the password
       const hashedPassword = await bcrypt.hash(password, 10);
       //update the new password
-      const user = await this.userModel.updateOne(
+      await this.userModel.updateOne(
         { email },
         {
           $set: {

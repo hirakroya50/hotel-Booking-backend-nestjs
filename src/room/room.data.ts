@@ -1,6 +1,5 @@
-const data = [
+export const data = [
   {
-    keywordForPlaces: [],
     id: 1,
     title: 'Dabble room',
     describtion: 'lorem',

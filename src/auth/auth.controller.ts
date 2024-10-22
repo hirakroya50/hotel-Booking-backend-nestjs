@@ -5,11 +5,11 @@ import {
   ResetPassword_otp_Verification,
 } from './dto/generateOtp.dto';
 import { SingUpDto } from './dto/signup.dto';
-import { varifyOtpDto } from './dto/verifyOtp.dto';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
 import {
   ForgetPasswordDto,
-  ForgetPasswordDto_tokenGeneration,
-  loginDto,
+  ForgetPasswordDtoTokenGeneration,
+  LoginDto,
 } from './dto/login.dto';
 import { GoogleLoginDto } from './dto/GoogleLogin.dto';
 
@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Post('/signup/Otp_verify')
-  verifyOtp(@Body() verifyOtpDto: varifyOtpDto) {
+  verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
     // return { verifyOtpDto };
     return this.authService.verifySignupOtp(verifyOtpDto);
   }
@@ -34,19 +34,19 @@ export class AuthController {
   }
 
   @Post('/logIn')
-  logIn(@Body() loginDto: loginDto) {
+  logIn(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
   @Post('/google_login')
-  googleLogin(@Body() GoogleLoginDto: GoogleLoginDto) {
-    return this.authService.googleLogin(GoogleLoginDto);
+  googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
+    return this.authService.googleLogin(googleLoginDto);
   }
 
   //forget password
   @Post('/forget_password_send_mail_with_token')
   forgetPasswordTokenLinkSend(
     @Body()
-    ForgetPasswordDto_tokenGeneration: ForgetPasswordDto_tokenGeneration,
+    ForgetPasswordDto_tokenGeneration: ForgetPasswordDtoTokenGeneration,
   ) {
     return this.authService.forgetPasswordTokenLinkSend(
       ForgetPasswordDto_tokenGeneration,
@@ -61,14 +61,7 @@ export class AuthController {
       token,
       forgetPasswordDto,
     );
-    // console.log(token, forgetPasswordDto);
-    // return {
-    //   sucess: 'email',
-    //   token,
-    //   forgetPasswordDto,
-    // };
   }
-  //reset password
 
   @Post('/reset_password_otpGeneration')
   resetPasswordOtpGeneration(@Body() genegenerateOtpDto: GenerateOtpDto) {

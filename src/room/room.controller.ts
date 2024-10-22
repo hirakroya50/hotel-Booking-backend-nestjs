@@ -5,14 +5,11 @@ import {
   UseInterceptors,
   Controller,
   Get,
-  UseGuards,
   Param,
-  NotFoundException,
   Put,
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthGuard } from '@nestjs/passport';
 import { RoomService } from './room.service';
 import { CloudinaryuplodeService } from './cloudinaryuplode.service';
 
@@ -31,7 +28,8 @@ export class RoomController {
     @Body()
     room: any, //room dto
   ) {
-    const upload = await this.roomService.uploadRoomData('result.url', room);
+    console.log(room, file);
+    const upload = await this.roomService.uploadRoomData();
     return upload;
   }
 
